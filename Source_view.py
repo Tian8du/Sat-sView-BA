@@ -628,18 +628,26 @@ if __name__ == "__main__":
     # 选择参考
     ref, ref_logs = select_reference_near_nadir(records, Z0=0.0, time_scope="same_group")
     # 校验RPC闭环误差
-    sanity_check_rpc_closure(ref, Zmid=-20)
+    # sanity_check_rpc_closure(ref, Zmid=-20)
+
+    # height_range = None
+    # if args.place == "JAX":
+    #     height_range = [-32, 224]
+    # elif args.place == "OMA":
+    #     height_range = [128, 384]
+    # elif args.place == "JAX+OMA":
+    #     height_range = [-32, 384]
+    # OMA 高度范围 257.149 到 368.628 建议训练范围设置为：128 到 384 JAX 高度范围 -31.560 到 140.012 建议训练范围设置为：-32 到 224
 
     # 深度窗（例）
-    H_prior = 10.0
-    Zmin, Zmax = -H_prior, +H_prior
+    Zmin, Zmax = -32.0, 32.0
 
     # Top-K（可打开内容多样性）
     sources = [r for r in records if r is not ref]
     picked, all_rows = select_topK_for_ref(
         ref, sources, Zmin, Zmax, K=6, dir_thresh_deg=20.0,
         W_disp=768, H_disp=768,
-        use_content_diversity=False,      # ← 若要开启内容多样性，改为 True
+        use_content_diversity=True,      # ← 若要开启内容多样性，改为 True
         tiles_xy=(6,6),
         tile_cov_thresh=0.25,
         eta_px_per_m_thresh=0.02
